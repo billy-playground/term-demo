@@ -7,7 +7,7 @@ go build .
 ```
 ## Fetch a blob to local file
 ```
-./term-demo blob <ref> [output-file-path]
+./term-demo blob <ref> <output-file-path>
 ```
 
 ## Copy an artifact between registries

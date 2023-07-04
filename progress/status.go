@@ -4,9 +4,13 @@ import (
 	"fmt"
 
 	"github.com/dustin/go-humanize"
-	"github.com/morikuni/aec"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 )
+
+var spinner = []rune("⠋⠋⠙⠙⠹⠹⠸⠸⠼⠼⠴⠴⠦⠦⠧⠧⠇⠇⠏⠏")
+var spinnerLen = len(spinner)
+
+var spinnerPos = 0
 
 // status is a progress status
 type status struct {
@@ -28,7 +32,7 @@ func (s *status) String(width int) string {
 	if s == nil {
 		return "loading..."
 	}
-	// todo: doesn't support multiline prompt
+
 	current := s.offset
 	total := uint64(s.descriptor.Size)
 	d := s.descriptor.Digest.Encoded()[:12]
@@ -43,7 +47,10 @@ func (s *status) String(width int) string {
 	if len(left)+len(right) > width {
 		right = fmt.Sprintf(" %.2f%%", percent*100)
 	}
-	out := fmt.Sprintf("%-*s%s", width-len(right)-1, left, right)
-	done := int(float64(len(out)) * percent)
-	return aec.Inverse.Apply(out[:done]) + out[done:]
+
+	if s.offset != uint64(s.descriptor.Size) {
+		spinnerPos = (spinnerPos + 2) % spinnerLen
+		right = fmt.Sprintf("%s %c", right, spinner[spinnerPos])
+	}
+	return fmt.Sprintf("%-*s%s", width-len(right)-1, left, right)
 }

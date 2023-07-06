@@ -179,7 +179,6 @@ func copy(ctx context.Context, from, to string) error {
 	} else {
 		fmt.Println("not a terminal")
 		desc, err = oras.Copy(ctx, src, from, dest, to, oras.DefaultCopyOptions)
-
 	}
 
 	if err != nil {

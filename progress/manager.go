@@ -41,7 +41,7 @@ type manager struct {
 func NewManager() (Manager, error) {
 	var m manager
 	var err error
-	// f, err := os.OpenFile("/dev/pts/1", os.O_RDWR, 0)
+	// f, err := os.OpenFile("/dev/pts/3", os.O_RDWR, 0)
 	// if err != nil {
 	// 	log.Fatalf("%+v", err)
 	// 	return nil, err
@@ -75,11 +75,10 @@ func (m *manager) start() {
 }
 
 func (m *manager) render() {
-	// todo: update size in another routine
-	width, height := m.c.Size()
-
 	m.mu.Lock()
 	defer m.mu.Unlock()
+	// todo: update size in another routine
+	width, height := m.c.Size()
 	len := len(m.statuses)
 	offset := 0
 	if len > height {

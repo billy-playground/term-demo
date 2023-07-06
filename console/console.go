@@ -55,7 +55,7 @@ func (c *Console) OutputTo(upCnt uint, str string) {
 	fmt.Fprint(c, "\0338")
 	fmt.Fprint(c, aec.Up(upCnt))
 	fmt.Fprint(c, aec.Column(0))
-	fmt.Fprint(c, str)
+	fmt.Fprint(c, str+" ")
 	fmt.Fprint(c, aec.EraseLine(aec.EraseModes.Tail))
 }
 

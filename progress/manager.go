@@ -88,7 +88,7 @@ func (m *manager) render() {
 	}
 
 	for ; offset < len; offset++ {
-		m.c.OutputTo(uint(len-offset), m.statuses[offset].String(width))
+		m.c.OutputTo(uint(len-offset-1), m.statuses[offset].String(width))
 	}
 }
 

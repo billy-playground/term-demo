@@ -48,11 +48,11 @@ func (c *Console) NewRow() {
 	fmt.Fprint(c, aec.Save)
 }
 
-func (c *Console) OutputTo(upCnt uint, a ...any) {
+func (c *Console) OutputTo(upCnt uint, str string) {
 	fmt.Fprint(c, aec.Restore)
 	fmt.Fprint(c, aec.Up(upCnt))
 	fmt.Fprint(c, aec.Column(0))
-	fmt.Fprint(c, a...)
+	fmt.Fprint(c, str+" ")
 	fmt.Fprint(c, aec.EraseLine(aec.EraseModes.Tail))
 }
 

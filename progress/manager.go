@@ -10,12 +10,12 @@ import (
 
 const BUFFER_SIZE = 20
 
-// Progress is print message channel
-type Progress chan<- *status
+// Status is print message channel
+type Status chan<- *status
 
 // Manager is progress view master
 type Manager interface {
-	Add() Progress
+	Add() Status
 	Wait()
 }
 
@@ -26,8 +26,6 @@ const (
 type manager struct {
 	statuses []*status
 
-	// todo: use separate routine to update size
-	// width, height int
 	done       chan struct{}
 	renderTick *time.Ticker
 	c          *console.Console
@@ -91,37 +89,37 @@ func (m *manager) render() {
 	}
 }
 
-func (m *manager) Add() Progress {
+func (m *manager) Add() Status {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	id := len(m.statuses)
+	m.statuses = append(m.statuses, nil)
+	defer m.c.NewRow()
+	return m.update(id)
+}
 
-	var s *status
-	m.statuses = append(m.statuses, s)
-	progress := make(chan *status, BUFFER_SIZE)
+func (m *manager) update(id int) Status {
+	ch := make(chan *status, BUFFER_SIZE)
 	m.updating.Add(1)
 	go func() {
 		defer m.updating.Done()
-		for s := range progress {
+		for s := range ch {
 			m.statuses[id] = s
 		}
 	}()
-
-	// add a new line to the end cursor
-	m.c.NewRow()
-	return progress
+	return ch
 }
 
 func (m *manager) Wait() {
 	m.close.Do(func() {
-		// 1. stop ticking
+		// 1. stop periodic render
 		m.renderTick.Stop()
+		close(m.done)
 		// 2. wait for all model update done
 		m.updating.Wait()
 		// 3. render last model
 		m.render()
 		// 4. restore cursor, mark done
 		defer m.c.Restore()
-		close(m.done)
 	})
 }

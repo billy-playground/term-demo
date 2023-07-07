@@ -34,7 +34,7 @@ type reader struct {
 	mu             sync.Mutex
 	m              progress.Manager
 	terminated     atomic.Bool
-	progress       progress.Progress
+	progress       progress.Status
 }
 
 func padPrompt(prompt1, prompt2 string) (string, string) {

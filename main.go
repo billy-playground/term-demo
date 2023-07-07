@@ -43,10 +43,12 @@ func main() {
 			if len(args) != 2 {
 				fmt.Println(helpCp)
 			}
-			if err := copy(ctx, args[0], args[1]); err != nil {
+			err, ref := copy(ctx, args[0], args[1])
+			if err != nil {
 				fmt.Fprintln(os.Stderr, "failed to copy:", err)
 				os.Exit(1)
 			}
+			fmt.Println("Copied", ref)
 			return
 		}
 
@@ -138,53 +140,5 @@ func fetchBlob(ctx context.Context, ref, outputPath string) (fetchErr error) {
 		waitFunc()
 		fmt.Println("Blob saved to", outputPath)
 	}
-	return nil
-}
-
-func copy(ctx context.Context, from, to string) error {
-	store, err := credentials.NewStoreFromDocker(credentials.StoreOptions{})
-	if err != nil {
-		return err
-	}
-	auth.DefaultClient.Credential = credentials.Credential(store)
-
-	src, err := remote.NewRepository(from)
-	if err != nil {
-		return err
-	}
-	src.PlainHTTP = PlainHTTP(src.Reference.Registry)
-
-	var dest oras.Target
-	repo, err := remote.NewRepository(to)
-	if err != nil {
-		return err
-	}
-	repo.PlainHTTP = PlainHTTP(repo.Reference.Registry)
-	dest = repo
-
-	var desc ocispec.Descriptor
-	if term.IsTerminal(int(os.Stdout.Fd())) {
-		err = func() error {
-			tracked, err := track.NewTarget(dest, "Copying", "Copied")
-			if err != nil {
-				return err
-			}
-			defer tracked.Wait()
-			desc, err = oras.Copy(ctx, src, from, tracked, to, oras.DefaultCopyOptions)
-			if err != nil {
-				return err
-			}
-			return nil
-		}()
-	} else {
-		fmt.Println("not a terminal")
-		desc, err = oras.Copy(ctx, src, from, dest, to, oras.DefaultCopyOptions)
-	}
-
-	if err != nil {
-		return err
-	}
-	repo.Reference.Reference = desc.Digest.String()
-	fmt.Println("Copied", repo.Reference)
 	return nil
 }

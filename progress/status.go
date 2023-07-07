@@ -7,12 +7,6 @@ import (
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
-var (
-	spinner    = []rune("⠋⠋⠙⠙⠹⠹⠸⠸⠼⠼⠴⠴⠦⠦⠧⠧⠇⠇⠏⠏")
-	spinnerLen = len(spinner)
-	spinnerPos = 0
-)
-
 // status is a progress status
 type status struct {
 	prompt     string
@@ -43,11 +37,7 @@ func (s *status) String(width int) string {
 	if name == "" {
 		name = s.descriptor.MediaType
 	}
-	left := fmt.Sprintf("%s %s %s", s.prompt, d, name)
-	if s.offset != uint64(s.descriptor.Size) {
-		spinnerPos = (spinnerPos + 1) % spinnerLen
-		left = fmt.Sprintf("%c %s", spinner[spinnerPos], left)
-	}
+	left := fmt.Sprintf("%c %s %s %s", GetMark(s), s.prompt, d, name)
 	right := fmt.Sprintf(" %s/%s %.2f%%", humanize.Bytes(current), humanize.Bytes(total), percent*100)
 	if len(left)+len(right) > width {
 		right = fmt.Sprintf(" %.2f%%", percent*100)

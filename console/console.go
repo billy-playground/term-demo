@@ -37,7 +37,7 @@ func GetConsole(f *os.File) (*Console, error) {
 }
 
 func (c *Console) Save() {
-	fmt.Fprint(c, aec.Show)
+	fmt.Fprint(c, aec.Hide)
 	// cannot use aec.Save since DEC has better support than SCO
 	fmt.Fprint(c, "\0337")
 }

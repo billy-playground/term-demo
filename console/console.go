@@ -38,16 +38,16 @@ func GetConsole(f *os.File) (*Console, error) {
 
 func (c *Console) Save() {
 	fmt.Fprint(c, aec.Hide)
+	// cannot use aec.Save since DEC has better support than SCO
 	fmt.Fprint(c, "\0337")
 }
 
 func (c *Console) NewRow() {
-	// fmt.Fprint(c, aec.Restore)
+	// cannot use aec.Restore since DEC has better support than SCO
 	fmt.Fprint(c, "\0338")
 	fmt.Fprint(c, aec.Down(1))
 	fmt.Fprint(c, aec.Column(0))
 	fmt.Fprint(c, "\0337")
-	// fmt.Fprint(c, aec.Save)
 }
 
 func (c *Console) OutputTo(upCnt uint, str string) {
@@ -55,14 +55,12 @@ func (c *Console) OutputTo(upCnt uint, str string) {
 	fmt.Fprint(c, "\0338")
 	fmt.Fprint(c, aec.Up(upCnt))
 	fmt.Fprint(c, aec.Column(0))
-	// fprintf will generate !(NOVERB) for no reason
 	fmt.Fprint(c, str+" ")
 	fmt.Fprint(c, aec.EraseLine(aec.EraseModes.Tail))
 }
 
 func (c *Console) Restore() {
 	fmt.Fprint(c, "\0338")
-	// fmt.Fprint(c, aec.Restore)
 	fmt.Fprint(c, aec.Column(0))
 	fmt.Fprint(c, aec.EraseLine(aec.EraseModes.All))
 	fmt.Fprint(c, aec.Show)

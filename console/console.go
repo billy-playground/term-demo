@@ -37,7 +37,7 @@ func GetConsole(f *os.File) (*Console, error) {
 }
 
 func (c *Console) Save() {
-	fmt.Fprint(c, aec.Hide)
+	fmt.Fprint(c, aec.Show)
 	// cannot use aec.Save since DEC has better support than SCO
 	fmt.Fprint(c, "\0337")
 }
@@ -45,12 +45,12 @@ func (c *Console) Save() {
 func (c *Console) NewRow() {
 	// cannot use aec.Restore since DEC has better support than SCO
 	fmt.Fprint(c, "\0338")
-	fmt.Fprint(c, aec.NextLine(1))
+	// print new line and scroll if need
+	fmt.Fprint(c, "\n")
 	fmt.Fprint(c, "\0337")
 }
 
 func (c *Console) OutputTo(upCnt uint, str string) {
-	// fmt.Fprint(c, aec.Restore)
 	fmt.Fprint(c, "\0338")
 	fmt.Fprint(c, aec.PreviousLine(upCnt))
 	fmt.Fprint(c, str+" ")
